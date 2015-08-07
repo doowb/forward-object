@@ -1,11 +1,11 @@
-# forward-object [![NPM version](https://badge.fury.io/js/forward-object.svg)](http://badge.fury.io/js/forward-object)  [![Build Status](https://travis-ci.org/doowb/forward-object.svg)](https://travis-ci.org/doowb/forward-object) 
+# forward-object [![NPM version](https://badge.fury.io/js/forward-object.svg)](http://badge.fury.io/js/forward-object)  [![Build Status](https://travis-ci.org/doowb/forward-object.svg)](https://travis-ci.org/doowb/forward-object)
 
 > Copy properties from an object to another object, where properties with function values will be invoked in the context of the provider, and properties with non-function values are just copied.
 
-## Install with [npm](npmjs.org)
+Install with [npm](https://www.npmjs.com/)
 
-```bash
-npm i forward-object --save
+```sh
+$ npm i forward-object --save
 ```
 
 ## Usage
@@ -15,35 +15,59 @@ var forwardObject = require('forward-object');
 ```
 
 ## API
-<!-- add a path or glob pattern for files with code comments to use for docs  -->
-{%= apidocs("index.js") %}
 
-## Related projects
-<!-- add an array of related projects, then un-escape the helper -->
-{%= related([]) %}  
+### [forward](index.js#L38)
 
-## Running tests
-Install dev dependencies.
+Copy properties from an object to another object, where properties with function values will be invoked in the context of the provider, and properties with non-function values are just copied.
 
-```bash
-npm i -d && npm test
+**Params**
+
+* `receiver` **{Object}**: Object to receive properties.
+* `provider` **{Object}**: Object providing properties.
+* `keys` **{Array}**: Optional array of keys to foward.
+* `returns` **{Object}**: Modified `receiver` object with properties from `provider`
+
+**Example**
+
+```js
+var receiver = {};
+var provider = {
+  name: 'provider',
+  upper: function (str) {
+    return '[' + this.name + '] ' + str.toUpperCase();
+  }
+};
+var receiver = forward(receiver, provider);
+receiver.name = 'receiver';
+console.log(receiver.upper('foo'));
+//=> [provider] FOO
 ```
 
+## Related projects
+
+## Running tests
+
+Install dev dependencies:
+
+```sh
+$ npm i -d && npm test
+```
 
 ## Contributing
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/doowb/forward-object/issues)
 
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/doowb/forward-object/issues/new)
 
 ## Author
 
 **Brian Woodward**
- 
+
 + [github/doowb](https://github.com/doowb)
-+ [twitter/doowb](http://twitter.com/doowb) 
++ [twitter/doowb](http://twitter.com/doowb)
 
 ## License
+
 Copyright © 2015 Brian Woodward
-Released under the MIT license
+Released under the MIT license.
 
 ***
 

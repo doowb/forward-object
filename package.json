@@ -21,5 +21,10 @@
   },
   "devDependencies": {
     "mocha": "*"
+  },
+  "verb": {
+    "related": {
+      "list": []
+    }
   }
 }
