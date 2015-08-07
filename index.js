@@ -7,7 +7,6 @@
 
 'use strict';
 
-
 /**
  * Copy properties from an object to another object,
  * where properties with function values will be
@@ -36,7 +35,7 @@
  */
 
 function forward(receiver, provider, keys) {
-  keys = keys || Object.keys(provider);
+  keys = keys || allKeys(provider);
   keys = Array.isArray(keys) ? keys : [keys];
 
   keys.forEach(function (key) {
@@ -51,6 +50,27 @@ function forward(receiver, provider, keys) {
     }
   });
   return receiver;
+}
+
+/**
+ * Get all the keys from an object, including keys
+ * inherited through a prototype chain
+ *
+ * ```js
+ * var keys = allKeys({foo: 'bar', bar: 'baz'});
+ * //=> ['foo', 'bar']
+ * ```
+ *
+ * @param  {Object} `obj` Object to get keys from
+ * @return {Array} Array of keys
+ */
+
+function allKeys (obj) {
+  var keys = [];
+  for (var key in obj) {
+    keys.push(key);
+  }
+  return keys;
 }
 
 /**
