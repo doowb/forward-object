@@ -1,7 +1,7 @@
 {
   "name": "forward-object",
   "description": "Copy properties from an object to another object, where properties with function values will be invoked in the context of the provider, and properties with non-function values are just copied.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/doowb/forward-object",
   "author": "Brian Woodward (https://github.com/doowb)",
   "repository": "doowb/forward-object",
