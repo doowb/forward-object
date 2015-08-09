@@ -30,12 +30,13 @@
  * @param  {Object} `receiver` Object to receive properties.
  * @param  {Object} `provider` Object providing properties.
  * @param  {Array} `keys` Optional array of keys to foward.
+ * @param  {Array} `omits` Optional keys to omit
  * @return {Object} Modified `receiver` object with properties from `provider`
  * @api public
  */
 
-function forward(receiver, provider, keys) {
-  keys = keys || allKeys(provider);
+function forward(receiver, provider, keys, omits) {
+  keys = keys || allKeys(provider, omits);
   keys = Array.isArray(keys) ? keys : [keys];
 
   keys.forEach(function (key) {
@@ -62,13 +63,18 @@ function forward(receiver, provider, keys) {
  * ```
  *
  * @param  {Object} `obj` Object to get keys from
+ * @param  {Object} `omits` Optional jeys to omit
  * @return {Array} Array of keys
  */
 
-function allKeys (obj) {
+function allKeys (obj, omits) {
   var keys = [];
+  omits = Array.isArray(omits) ? omits : [];
+
   for (var key in obj) {
-    keys.push(key);
+    if (omits.indexOf(key) === -1) {
+      keys.push(key);
+    }
   }
   return keys;
 }
