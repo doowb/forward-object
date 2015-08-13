@@ -7,74 +7,109 @@
 
 'use strict';
 
+var define = require('define-property');
+
 /**
- * Copy properties from an object to another object,
- * where properties with function values will be
- * invoked in the context of the provider, and properties
- * with non-function values are just copied.
+ * Returns a function for copying properties from an object
+ * to another object.
  *
  * ```js
- * var receiver = {};
- * var provider = {
- *   name: 'provider',
- *   upper: function (str) {
- *     return '[' + this.name + '] ' + str.toUpperCase();
- *   }
- * };
- * var receiver = forward(receiver, provider);
- * receiver.name = 'receiver';
- * console.log(receiver.upper('foo'));
- * //=> [provider] FOO
+ * var forward = require('forward-object')({omit: ['foo']});
  * ```
  *
- * @param  {Object} `receiver` Object to receive properties.
- * @param  {Object} `provider` Object providing properties.
- * @param  {Array} `keys` Optional array of keys to foward.
- * @return {Object} Modified `receiver` object with properties from `provider`
+ * @param {Object} `options`
+ * @param {Boolean} `options.enumerable` Make copied properties enumerable. `true` is the default.
+ * @param {Array|String} `options.keys` Limit forwarding to the specified keys.
+ * @param {Array|String} `options.omit` Exclude the specified keys from being copied.
  * @api public
  */
 
-function forward(receiver, provider, keys) {
-  keys = keys || allKeys(provider);
-  keys = Array.isArray(keys) ? keys : [keys];
+module.exports = function(options) {
+  options = options || {};
+  var keys = options.keys;
+  var omit = options.omit || [];
 
-  keys.forEach(function (key) {
-    var val = provider[key];
+  /**
+   * Copy properties from the `provider` object to the `receiver`.
+   *
+   * Properties with function values will be invoked in the context
+   * of the provider, and properties with non-function values are
+   * just copied.
+   *
+   * @name forward
+   * @param {Object} `receiver`
+   * @param {Object} `provider`
+   * @return {Object} Receiver with forwarded properties from provider.
+   * @api public
+   */
 
-    if (typeof val === 'function') {
-      receiver[key] = function () {
-        return provider[key].apply(provider, arguments);
-      };
-    } else {
-      receiver[key] = val;
-    }
-  });
-  return receiver;
+  return function forwardObject(receiver, provider) {
+    keys = keys ? arrayify(keys) : objectKeys(provider, omit);
+
+    keys.forEach(function (key) {
+      if (options.enumerable === false) {
+        defineProps(receiver, provider, key);
+      } else {
+        copy(receiver, provider, key);
+      }
+    });
+    return receiver;
+  }
 }
 
 /**
- * Get all the keys from an object, including keys
- * inherited through a prototype chain
- *
- * ```js
- * var keys = allKeys({foo: 'bar', bar: 'baz'});
- * //=> ['foo', 'bar']
- * ```
+ * Get keys from `object`, including keys
+ * inherited through the prototype chain
  *
  * @param  {Object} `obj` Object to get keys from
  * @return {Array} Array of keys
  */
 
-function allKeys (obj) {
+function objectKeys (obj, omit) {
   var keys = [];
   for (var key in obj) {
+    if (~omit.indexOf(key)) continue;
     keys.push(key);
   }
   return keys;
 }
 
 /**
- * Export `forward` function
+ * Cast `val` to an array.
  */
 
-module.exports = forward;
+function arrayify (val) {
+  return Array.isArray(val) ? val : [val];
+}
+
+/**
+ * Copy properties from object `b` to object `a` and
+ * make them non-enumerable.
+ */
+
+function defineProps(a, b, key) {
+  var val = b[key];
+  if (typeof val === 'function') {
+    define(a, key, function () {
+      return val.apply(b, arguments);
+    });
+  } else {
+    define(a, key, val);
+  }
+}
+
+/**
+ * Copy properties from object `b` to object `a` and
+ * make them enumerable.
+ */
+
+function copy(a, b, key) {
+  var val = b[key];
+  if (typeof val === 'function') {
+    a[key] = function () {
+      return val.apply(b, arguments);
+    };
+  } else {
+    a[key] = val;
+  }
+}
